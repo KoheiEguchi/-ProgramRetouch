@@ -80,6 +80,7 @@ public class ItemDAO {
 				item.setDetail(rs.getString("name"));
 				item.setPrice(rs.getInt("price"));
 				item.setFileName(rs.getString("file_name"));
+				item.setDetail(rs.getString("detail"));
 			}
 
 			System.out.println("searching item by itemID has been completed");
