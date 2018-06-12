@@ -1,18 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="beans.BuyDataBeans"%>
-<%@ page import="beans.UserDataBeans"%>
-<%@ page import=" java.util.ArrayList"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
 <!DOCTYPE html>
 <html>
+
 <head>
-<meta charset="UTF-8">
-<title>ユーザー情報</title>
-<jsp:include page="/baselayout/head.html" />
-<%
-	String validationMessage = (String) request.getAttribute("validationMessage");
-	UserDataBeans udb = (UserDataBeans)request.getAttribute("udb");
-%>
+	<meta charset="UTF-8">
+	<title>ユーザー情報</title>
+	<jsp:include page="/baselayout/head.html" />
 </head>
+
 <body>
 	<jsp:include page="/baselayout/header.jsp" />
 	<br>
@@ -26,25 +23,21 @@
 				<div class="card grey lighten-5">
 					<div class="card-content">
 						<form action="UserDataUpdateConfirm" method="POST">
-							<%
-								if (validationMessage != null) {
-							%>
-							<p class="red-text center-align"><%=validationMessage%></p>
-							<%
-								}
-							%>
+							<c:if test="${validationMessage != null} ">
+								<p class="red-text center-align">${validationMessage}</p>
+							</c:if>
 							<br> <br>
 							<div class="row">
 								<div class="input-field col s6">
-									<input type="text" name="user_name" value="<%=udb.getName()%>"> <label>名前</label>
+									<input type="text" name="user_name" value="${udb.name}"> <label>名前</label>
 								</div>
 								<div class="input-field col s6">
-									<input type="text" name="login_id" value="<%=udb.getLoginId()%>"> <label>ログインID</label>
+									<input type="text" name="login_id" value="${udb.loginId}"> <label>ログインID</label>
 								</div>
 							</div>
 							<div class="row">
 								<div class="input-field col s12">
-									<input type="text" name="user_address" value="<%=udb.getAddress()%>"> <label>住所</label>
+									<input type="text" name="user_address" value="${udb.address}"> <label>住所</label>
 								</div>
 							</div>
 							<div class="row">
@@ -73,18 +66,14 @@
 							</thead>
 							<tbody>
 
+							<c:forEach var="bought" items="${boughtList}">
 								<tr>
-									<td class="center"><a href="UserBuyHistoryDetail?buy_id=1" class="btn-floating btn waves-effect waves-light "> <i class="material-icons">details</i></a></td>
-									<td class="center">1234年56月78日90時12分</td>
-									<td class="center">サンプル配送料金</td>
-									<td class="center"><123456789円円</td>
+									<td class="center"><a href="UserBuyHistoryDetail?check_id=${bought.id}" class="btn-floating btn waves-effect waves-light "> <i class="material-icons">details</i></a></td>
+									<td class="center"> ${bought.formatDate}</td>
+									<td class="center"> ${bought.deliveryMethodName}</td>
+									<td class="center"> ${bought.totalPrice}円</td>
 								</tr>
-								<tr>
-									<td class="center"><a href="UserBuyHistoryDetail?buy_id=2" class="btn-floating btn waves-effect waves-light "> <i class="material-icons">details</i></a></td>
-									<td class="center">1234年56月78日90時12分</td>
-									<td class="center">サンプル配送料金</td>
-									<td class="center"><123456789円円</td>
-								</tr>
+							</c:forEach>
 
 							</tbody>
 						</table>

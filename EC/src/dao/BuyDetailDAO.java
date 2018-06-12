@@ -5,9 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 
 import base.DBManager;
 import beans.BuyDetailDataBeans;
+import beans.DeliveryMethodDataBeans;
 import beans.ItemDataBeans;
 
 public class BuyDetailDAO {
@@ -92,6 +94,7 @@ public class BuyDetailDAO {
 	public static ArrayList<ItemDataBeans> getItemDataBeansListByBuyId(int buyId) throws SQLException {
 		Connection con = null;
 		PreparedStatement st = null;
+		ArrayList<ItemDataBeans> buyIDBList = new ArrayList<ItemDataBeans>();
 		try {
 			con = DBManager.getConnection();
 
@@ -106,20 +109,20 @@ public class BuyDetailDAO {
 			st.setInt(1, buyId);
 
 			ResultSet rs = st.executeQuery();
-			ArrayList<ItemDataBeans> buyDetailItemList = new ArrayList<ItemDataBeans>();
+
 
 			while (rs.next()) {
-				ItemDataBeans idb = new ItemDataBeans();
-				idb.setId(rs.getInt("id"));
-				idb.setName(rs.getString("name"));
-				idb.setPrice(rs.getInt("price"));
+				int id = (rs.getInt("id"));
+				String name = (rs.getString("name"));
+				int price = (rs.getInt("price"));
 
+				ItemDataBeans idb = new ItemDataBeans(id,name,price);
 
-				buyDetailItemList.add(idb);
+				buyIDBList.add(idb);
 			}
 
 			System.out.println("searching ItemDataBeansList by BuyID has been completed");
-			return buyDetailItemList;
+
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 			throw new SQLException(e);
@@ -128,6 +131,91 @@ public class BuyDetailDAO {
 				con.close();
 			}
 		}
+		return buyIDBList;
 	}
+
+		public static ItemDataBeans boughtDetail(String checkId) throws SQLException {
+			Connection con = null;
+			PreparedStatement st = null;
+			try {
+				con = DBManager.getConnection();
+
+				st = con.prepareStatement(
+						"SELECT total_price, delivery_method_id, create_date"
+						+ " FROM ec_db.t_buy"
+						+ " WHERE t_buy.id = ?");
+				st.setString(1, checkId);
+
+				ResultSet rs = st.executeQuery();
+
+				if (!(rs.next())) {
+					return null;
+				}
+
+					int totalPrice = (rs.getInt("total_price"));
+					Date buyDate = (rs.getTimestamp("create_date"));
+					int delivertMethodId = (rs.getInt("delivery_method_id"));
+
+					DeliveryMethodDataBeans delivery = DeliveryMethodDAO.getDeliveryMethodDataBeansByID(delivertMethodId);
+					String deliveryMethodName = delivery.getName();
+					int deliveryMethodPrice = delivery.getPrice();
+					ItemDataBeans boughtDetail1 = new ItemDataBeans(totalPrice,buyDate,deliveryMethodName,deliveryMethodPrice);
+
+				System.out.println("searching ItemDataBeansList by BuyID has been completed");
+				return boughtDetail1;
+
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+				throw new SQLException(e);
+			} finally {
+				if (con != null) {
+					con.close();
+				}
+			}
+
+		}
+
+		public static ArrayList<ItemDataBeans> boughtListData(String checkId) throws SQLException {
+			Connection con = null;
+			PreparedStatement st = null;
+			ArrayList<ItemDataBeans> boughtDetailList2 = new ArrayList<ItemDataBeans>();
+			try {
+				con = DBManager.getConnection();
+
+				st = con.prepareStatement(
+						"SELECT DISTINCT name,price "
+						+ "FROM ec_db.m_item "
+						+ "JOIN ec_db.t_buy_detail "
+						+ "ON m_item.id = t_buy_detail.item_id "
+						+ "WHERE item_id IN"
+						+ " (SELECT item_id "
+						+ "FROM ec_db.t_buy_detail "
+						+ "WHERE id IN"
+						+ " (SELECT id "
+						+ "FROM ec_db.t_buy_detail "
+						+ "WHERE buy_id = ?)"
+						+" )");
+				st.setString(1, checkId);
+
+				ResultSet rs = st.executeQuery();
+
+				while (rs.next()) {
+					ItemDataBeans boughtDetail2 = new ItemDataBeans();
+					boughtDetail2.setName(rs.getString("name"));
+					boughtDetail2.setPrice(rs.getInt("price"));
+
+					boughtDetailList2.add(boughtDetail2);
+				}
+
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+				throw new SQLException(e);
+			} finally {
+				if (con != null) {
+					con.close();
+				}
+			}
+			return boughtDetailList2;
+		}
 
 }

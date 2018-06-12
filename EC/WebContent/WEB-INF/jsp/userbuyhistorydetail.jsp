@@ -1,11 +1,14 @@
 <%@	page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>購入履歴詳細</title>
-<jsp:include page="/baselayout/head.html" />
+	<meta charset="UTF-8">
+	<title>購入履歴詳細</title>
+	<jsp:include page="/baselayout/head.html" />
 </head>
+
 <body>
 	<jsp:include page="/baselayout/header.jsp" />
 	<br>
@@ -29,9 +32,9 @@
 							</thead>
 							<tbody>
 								<tr>
-									<td class="center">1234年56月78日90時12分</td>
-									<td class="center">サンプル</td>
-									<td class="center">123456789円</td>
+									<td class="center"> ${boughtDetail1.formatDate}</td>
+									<td class="center"> ${boughtDetail1.deliveryMethodName}</td>
+									<td class="center"> ${boughtDetail1.totalPrice}円</td>
 								</tr>
 							</tbody>
 						</table>
@@ -52,22 +55,17 @@
 								</tr>
 							</thead>
 							<tbody>
+							<c:forEach var="boughtDetail2" items="${boughtDetailList2}">
 								<tr>
-									<td class="center">サンプル商品名1</td>
-									<td class="center">111111111円</td>
+									<td class="center">${boughtDetail2.name}</td>
+									<td class="center">${boughtDetail2.price}円</td>
 								</tr>
+							</c:forEach>
 								<tr>
-									<td class="center">サンプル商品名2</td>
-									<td class="center">222222222円</td>
+									<td class="center">${boughtDetail1.deliveryMethodName}</td>
+									<td class="center">${boughtDetail1.deliveryMethodPrice}円</td>
 								</tr>
-								<tr>
-									<td class="center">サンプル商品名3</td>
-									<td class="center">333333333円</td>
-								</tr>
-								<tr>
-									<td class="center">サンプル</td>
-									<td class="center">123456789円</td>
-								</tr>
+
 							</tbody>
 						</table>
 					</div>
@@ -77,4 +75,5 @@
 	</div>
 	<jsp:include page="/baselayout/footer.jsp" />
 </body>
+
 </html>
